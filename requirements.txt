@@ -1,3 +1,7 @@
+# will eventually live in setup.py
+orgcrawler
+
+# testing
 pytest
 pytest-cov
 moto
