@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import tempfile
 
@@ -18,12 +19,25 @@ def test_makes_spec_instance():
     assert isinstance(my_spec, Spec)
     assert my_spec.spec_dir == os.path.expanduser(DEFAULT_SPEC_DIR)
     
-def test_validate_spec_dir():
+# https://docs.pytest.org/en/stable/logging.html
+def test_validate_spec_dir(caplog):
     my_spec = Spec(spec_dir=os.path.join(TEST_SPEC_BASEDIR, 'spec.d'))
-    my_spec.validate()
-    assert os.path.isdir(my_spec.spec_dir)
-    assert isinstance(my_spec.repo, git.Repo)
-    print(TEST_SPEC_BASEDIR)
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        my_spec.validate()
+    assert pytest_wrapped_e.type == SystemExit
+    assert pytest_wrapped_e.value.code == 1 
+
+    #print(caplog.record_tuples)
+    for record in caplog.records:
+        #print(record.levelname)
+        assert record.levelname == "ERROR"
+
+
+    #assert os.path.isdir(my_spec.spec_dir)
+    #assert isinstance(my_spec.repo, git.Repo)
+    #print(TEST_SPEC_BASEDIR)
+
+    #assert False
     cleanup()
 
 
