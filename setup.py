@@ -10,47 +10,45 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='aws-orgs',
+    name='orgtiger',
     version=__version__,
     description='Tools to manage AWS Organization resources',
     long_description=long_description,
-    url='https://github.com/ucopacme/aws-orgs',
+    url='https://github.com/weednix/orgtiger',
     author=['Ashley Gould', 'Santhosh Katakam', 'Sophia Rice-Smith'],
-    author_email=['agould@ucop.edu','santh[ubhai12@gmail.com'],
+    author_email=['agould@ucop.edu','santhubhai12@gmail.com', 'ssrice@ucdavis.edu'],
     license='MIT',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
+        'Topic :: Software Development :: Build Tools ',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+
     ],
-    keywords='aws organizations',
+    keywords='aws organizations setup tool',
+    project_urls={
+        'Documentation': '',
+        'Source':'https://github.com/weednix/orgtiger',
+    },
     packages=find_packages(exclude=['scratch', 'notes']),
     install_requires=[
         'boto3', 
-        'docopt', 
+        'click', 
         'PyYAML', 
-        'passwordgenerator',
         'cerberus',
         'orgcrawler',
+        'pytest',
     ],
     package_data={
-        'orgtiger': [
-            'data/*',
-            'spec_init_data/*',
-            'spec_init_data/spec.d/*',
-        ],
+        'orgtiger': [],
     },
     entry_points={
         'console_scripts': [
-            'awsorgs=awsorgs.orgs:main',
-            'awsaccounts=awsorgs.accounts:main',
-        #    'awsauth=awsorgs.auth:main',
-            'awsloginprofile=awsorgs.loginprofile:main',
-            'awsorgs-accessrole=awsorgs.tools.accessrole:main',
-            'awsorgs-spec-init=awsorgs.tools.spec_init:main',
         ],
     },
 
