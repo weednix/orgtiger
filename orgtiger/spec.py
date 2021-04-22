@@ -4,7 +4,7 @@ import inspect
 
 from orgcrawler.logger import Logger
 
-import git
+from git import Repo
 from git.exc import InvalidGitRepositoryError, NoSuchPathError
 
 
@@ -24,13 +24,21 @@ class Spec(object):
             'METHOD': inspect.stack()[0][3],
         }
         try:
-            self.repo = git.Repo(self.spec_dir)
+            self.repo = Repo(self.spec_dir)
         except NoSuchPathError as e:
-            logmsg['ERROR'] = "Spec dir '{}' does not exist.  Try running Spec.generate()".format(self.spec_dir)
-            self.log.error(logmsg)
+            logmsg['MESSAGE'] = "Spec dir '{}' does not exist.  Try running Spec.generate()".format(self.spec_dir)
+            self.log.critical(logmsg)
             sys.exit(1)
         except InvalidGitRepositoryError as e:
-            self.log.error("Spec dir {} is not a git repo.  Try running Spec.generate()", self.spec_dir)
+            logmsg['MESSAGE'] = "Spec dir {} is not a git repo.  Try running Spec.generate()".format(self.spec_dir)
+            self.log.error(logmsg)
+            return False
+        if self.repo.is_dirty():
+            logmsg['MESSAGE'] = "Spec dir {} has uncommited changes.".format(self.spec_dir)
+            self.log.error(logmsg)
+            return False
+        return True
+        
 
     def generate(self):
         os.makedirs(self.spec_dir, exist_ok=True)
