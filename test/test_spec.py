@@ -6,7 +6,12 @@ import tempfile
 import pytest
 from git import Repo
 
-from  orgtiger.spec import DEFAULT_SPEC_DIR, Spec 
+from  orgtiger.spec import (
+    DEFAULT_SPEC_DIR,
+    SPEC_VALIDATION_ERROR,
+    SPEC_GENERATION_ERROR,
+    Spec,
+)
 
 
 TEST_SPEC_BASEDIR = tempfile.mkdtemp()
@@ -25,10 +30,9 @@ def test_validate_spec_dir(caplog):
     # spec_dir does not exist
     my_spec = Spec(spec_dir=os.path.join(TEST_SPEC_BASEDIR, 'spec.d'))
     assert not os.path.isdir(my_spec.spec_dir)
-    with pytest.raises(SystemExit) as pytest_wrapped_e:
+    with pytest.raises(SPEC_VALIDATION_ERROR) as pytest_wrapped_e:
         my_spec.validate()
-    assert pytest_wrapped_e.type == SystemExit
-    assert pytest_wrapped_e.value.code == 1 
+    assert pytest_wrapped_e.type == SPEC_VALIDATION_ERROR
     # https://docs.pytest.org/en/stable/logging.html
     #print(caplog.record_tuples)
     for record in caplog.records:
@@ -67,10 +71,33 @@ def test_validate_spec_dir(caplog):
     cleanup()
 
 def test_generate_spec_dir(caplog):
-    #assert os.path.isdir(my_spec.spec_dir)
-    #assert isinstance(my_spec.repo, git.Repo)
-    #print(TEST_SPEC_BASEDIR)
-    return
+    my_spec = Spec(spec_dir=os.path.join(TEST_SPEC_BASEDIR, 'spec.d'))
+    my_spec.generate()
+    return_value = my_spec.validate()
+    assert return_value
+    cleanup()
+
+    os.makedirs(my_spec.spec_dir)
+    my_spec.generate()
+    return_value = my_spec.validate()
+    assert return_value
+    cleanup()
+
+    os.makedirs(my_spec.spec_dir)
+    with open(os.path.join(my_spec.spec_dir, 'emptyfile'), mode='w'): pass
+    with pytest.raises(SPEC_GENERATION_ERROR) as pytest_wrapped_e:
+        my_spec.generate()
+    assert pytest_wrapped_e.type == SPEC_GENERATION_ERROR
+    cleanup()
+
+    os.makedirs(TEST_SPEC_BASEDIR)
+    with open(my_spec.spec_dir, mode='w'): pass
+    with pytest.raises(SPEC_GENERATION_ERROR) as pytest_wrapped_e:
+        my_spec.generate()
+    assert pytest_wrapped_e.type == SPEC_GENERATION_ERROR
+    cleanup()
+
+    assert False
 
 
 
