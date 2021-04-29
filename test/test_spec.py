@@ -99,4 +99,14 @@ def test_generate_spec_dir(caplog):
 
     #assert False
 
+```
+test generation of common.yaml
+
+file exists
+file passes cerubus parsing (must contain the following parameters):
+    minimum_version
+    master_account_id
+    default_ou
+    default_sc_policy
+params match default or supplied values 
 
