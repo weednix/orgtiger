@@ -61,10 +61,14 @@ class Spec(object):
         except InvalidGitRepositoryError as e:
             if os.path.isdir(self.spec_dir) and not os.listdir(self.spec_dir):
                 self._init_new_repo()
-            else:
-                logmsg['MESSAGE'] = "Cannot initialize git repo in spec dir '{}'".format(self.spec_dir)
+            elif os.path.isdir(self.spec_dir) and os.listdir(self.spec_dir):
+                logmsg['MESSAGE'] = "Cannot initialize git repo in spec dir. '{}' is not empty".format(self.spec_dir)
                 self.log.critical(logmsg)
-                raise SPEC_GENERATION_ERROR('Cannot initialize git repo')
+                raise SPEC_GENERATION_ERROR('proposed spec_dir is not empty')
+            elif os.path.isfile(self.spec_dir):
+                logmsg['MESSAGE'] = "Cannot initialize git repo in spec dir. '{}' is not a directory".format(self.spec_dir)
+                self.log.critical(logmsg)
+                raise SPEC_GENERATION_ERROR('proposed spec_dir is a file')
 
     def _init_new_repo(self):
         self.repo = Repo.init(self.spec_dir)

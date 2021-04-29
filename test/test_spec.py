@@ -97,34 +97,6 @@ def test_generate_spec_dir(caplog):
     assert pytest_wrapped_e.type == SPEC_GENERATION_ERROR
     cleanup()
 
-    assert False
+    #assert False
 
 
-
-
-'''
-if no spec dir:
-  error: specdir not found.  provide hint about spec generator tool.
-  exit
-
-if spec dir, but not a git repo:
-  warn: spec dir not under version contoll
-
-if spec dir and git repo
-  info: report current branch, last commit date
-
-  if working tree is dirty
-    warn: uncommitted changes in spec dir
-'''
-
-'''
-using spec.generate()
-
-if specdir exists and is not empty:
-  error: specdir exists and is not empty
-  exit
-else:
-  attept to create spec dir. passive fail if exists  
-  initialize git repo
-
-'''
