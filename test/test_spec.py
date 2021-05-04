@@ -75,32 +75,36 @@ def test_generate_spec_dir(caplog):
     my_spec.generate()
     return_value = my_spec.validate()
     assert return_value
-    cleanup()
+    #cleanup()
 
-    os.makedirs(my_spec.spec_dir)
-    my_spec.generate()
-    return_value = my_spec.validate()
-    assert return_value
-    cleanup()
+    #os.makedirs(my_spec.spec_dir)
+    #my_spec.generate()
+    #return_value = my_spec.validate()
+    #assert return_value
+    #cleanup()
 
-    os.makedirs(my_spec.spec_dir)
-    with open(os.path.join(my_spec.spec_dir, 'emptyfile'), mode='w'): pass
-    with pytest.raises(SPEC_GENERATION_ERROR) as pytest_wrapped_e:
-        my_spec.generate()
-    assert pytest_wrapped_e.type == SPEC_GENERATION_ERROR
-    cleanup()
+    #os.makedirs(my_spec.spec_dir)
+    #with open(os.path.join(my_spec.spec_dir, 'emptyfile'), mode='w'): pass
+    #with pytest.raises(SPEC_GENERATION_ERROR) as pytest_wrapped_e:
+    #    my_spec.generate()
+    #assert pytest_wrapped_e.type == SPEC_GENERATION_ERROR
+    #cleanup()
 
-    os.makedirs(TEST_SPEC_BASEDIR)
-    with open(my_spec.spec_dir, mode='w'): pass
-    with pytest.raises(SPEC_GENERATION_ERROR) as pytest_wrapped_e:
-        my_spec.generate()
-    assert pytest_wrapped_e.type == SPEC_GENERATION_ERROR
-    cleanup()
+    #os.makedirs(TEST_SPEC_BASEDIR)
+    #with open(my_spec.spec_dir, mode='w'): pass
+    #with pytest.raises(SPEC_GENERATION_ERROR) as pytest_wrapped_e:
+    #    my_spec.generate()
+    #assert pytest_wrapped_e.type == SPEC_GENERATION_ERROR
+    #cleanup()
 
-    #assert False
+    assert False
 
-```
-test generation of common.yaml
+
+
+
+"""
+
+test generation of common.yaml.  This action may need to live in tiger object
 
 file exists
 file passes cerubus parsing (must contain the following parameters):
@@ -110,3 +114,5 @@ file passes cerubus parsing (must contain the following parameters):
     default_sc_policy
 params match default or supplied values 
 
+https://jinja.palletsprojects.com/en/2.11.x/intro/#basic-api-usage
+"""
