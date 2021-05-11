@@ -5,6 +5,18 @@ import tempfile
 
 import pytest
 from git import Repo
+from moto import (
+    mock_organizations,
+    mock_sts,
+    mock_iam,
+)
+
+from orgcrawler import orgs
+from orgcrawler.mock.org import (
+    MockOrganization,
+    ORG_ACCESS_ROLE,
+    MASTER_ACCOUNT_ID,
+)
 
 from  orgtiger.spec import (
     DEFAULT_SPEC_DIR,
@@ -70,34 +82,49 @@ def test_validate_spec_dir(caplog):
     #assert False
     cleanup()
 
-def test_generate_spec_dir(caplog):
+def test_generate_repo(caplog):
     my_spec = Spec(spec_dir=os.path.join(TEST_SPEC_BASEDIR, 'spec.d'))
-    my_spec.generate()
+    my_spec.generate_repo()
     return_value = my_spec.validate()
     assert return_value
-    #cleanup()
+    cleanup()
 
-    #os.makedirs(my_spec.spec_dir)
-    #my_spec.generate()
-    #return_value = my_spec.validate()
-    #assert return_value
-    #cleanup()
+    os.makedirs(my_spec.spec_dir)
+    my_spec.generate_repo()
+    return_value = my_spec.validate()
+    assert return_value
+    cleanup()
 
-    #os.makedirs(my_spec.spec_dir)
-    #with open(os.path.join(my_spec.spec_dir, 'emptyfile'), mode='w'): pass
-    #with pytest.raises(SPEC_GENERATION_ERROR) as pytest_wrapped_e:
-    #    my_spec.generate()
-    #assert pytest_wrapped_e.type == SPEC_GENERATION_ERROR
-    #cleanup()
+    os.makedirs(my_spec.spec_dir)
+    with open(os.path.join(my_spec.spec_dir, 'emptyfile'), mode='w'): pass
+    with pytest.raises(SPEC_GENERATION_ERROR) as pytest_wrapped_e:
+        my_spec.generate_repo()
+    assert pytest_wrapped_e.type == SPEC_GENERATION_ERROR
+    cleanup()
 
-    #os.makedirs(TEST_SPEC_BASEDIR)
-    #with open(my_spec.spec_dir, mode='w'): pass
-    #with pytest.raises(SPEC_GENERATION_ERROR) as pytest_wrapped_e:
-    #    my_spec.generate()
-    #assert pytest_wrapped_e.type == SPEC_GENERATION_ERROR
-    #cleanup()
+    os.makedirs(TEST_SPEC_BASEDIR)
+    with open(my_spec.spec_dir, mode='w'): pass
+    with pytest.raises(SPEC_GENERATION_ERROR) as pytest_wrapped_e:
+        my_spec.generate_repo()
+    assert pytest_wrapped_e.type == SPEC_GENERATION_ERROR
+    cleanup()
 
-    assert False
+    #assert False
+
+@mock_sts
+@mock_organizations
+def test_generate_spec_from_org():
+    MockOrganization().simple()
+    my_org = orgs.Org(MASTER_ACCOUNT_ID, ORG_ACCESS_ROLE)
+    my_org.load()
+    my_spec = Spec(spec_dir=os.path.join(TEST_SPEC_BASEDIR, 'spec.d'))
+    my_spec.generate_repo()
+    my_spec.generate_spec_from_org(my_org)
+    assert os.path.isfile(os.path.join(my_spec.spec_dir, 'common.yaml'))
+
+
+
+
 
 
 

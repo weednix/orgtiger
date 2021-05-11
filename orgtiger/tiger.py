@@ -1,6 +1,8 @@
 import orgcrawler
 import orgcrawler.orgs
 
+from orgtiger.spec import Spec
+
 
 class OrgTiger(object):
 
@@ -8,3 +10,8 @@ class OrgTiger(object):
         self.name = name
         if master_account_id is not None:
             self.org = orgcrawler.orgs.Org(master_account_id, org_access_role)
+        self.spec = Spec()
+
+    def generate():
+        return
+        

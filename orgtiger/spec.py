@@ -10,6 +10,7 @@ from git import Repo
 from git.exc import InvalidGitRepositoryError, NoSuchPathError
 from cerberus import Validator, schema_registry
 
+from orgcrawler import orgs
 from orgcrawler.logger import Logger
 from orgtiger.schemas import (
     COMMON_SCHEMA,
@@ -52,7 +53,7 @@ class Spec(object):
         return True
         
 
-    def generate(self):
+    def generate_repo(self):
         logmsg = {
             'FILE': __file__.split('/')[-1],
             'CLASS': self.__class__.__name__,
@@ -77,7 +78,6 @@ class Spec(object):
                 self.log.critical(logmsg)
                 raise SPEC_GENERATION_ERROR('proposed spec_dir is a file')
 
-
     def _init_new_repo(self):
         self.repo = Repo.init(self.spec_dir)
         with open(os.path.join(self.spec_dir, 'README.rst'), mode='a') as f:
@@ -85,10 +85,19 @@ class Spec(object):
             f.write('===================')
         self.repo.index.add(os.path.join(self.spec_dir, 'README.rst'))
         self.repo.index.commit('initial commit')
-        self._init_common_dot_yaml()
 
 
-    def _init_common_dot_yaml(self):
+    def generate_spec_from_org(self, org=None):
+        logmsg = {
+            'FILE': __file__.split('/')[-1],
+            'CLASS': self.__class__.__name__,
+            'METHOD': inspect.stack()[0][3],
+        }
+        if org is not None and isinstance(org, orgs.Org):
+            self._init_common(org)
+
+
+    def _init_common(self, org):
         logmsg = {
             'FILE': __file__.split('/')[-1],
             'CLASS': self.__class__.__name__,
@@ -99,8 +108,9 @@ class Spec(object):
         logmsg['MESSAGE'] = "processing template file '{}'".format(template_file)
         print(logmsg['MESSAGE'])
         with open(template_file) as t:
-            # I need to do this from tiger object.  not here.  I don't have master_account_id in spec opbject
-            spec_file = Template(t.read()).render(master_account_id = self.master_account_id)
+            spec_file = Template(t.read()).render(master_account_id = org.master_account_id)
         print(spec_file)
+        with open(os.path.join(self.spec_dir, 'common.yaml'), 'w') as f:
+            f.write(spec_file)
 
 
