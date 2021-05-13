@@ -15,8 +15,8 @@ setup(
     description='Tools to manage AWS Organization resources',
     long_description=long_description,
     url='https://github.com/weednix/orgtiger',
-    author=['Ashley Gould', 'Santhosh Katakam', 'Sophia Rice-Smith'],
-    author_email=['agould@ucop.edu','santhubhai12@gmail.com', 'ssrice@ucdavis.edu'],
+    author='Ashley Gould, Santhosh Katakam, Sophia Rice-Smith',
+    author_email='agould@ucop.edu,santhubhai12@gmail.com, ssrice@ucdavis.edu',
     license='MIT',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
@@ -32,7 +32,7 @@ setup(
     ],
     keywords='aws organizations setup tool',
     project_urls={
-        'Documentation': '',
+        'Documentation': 'https://github.com/weednix/orgtiger',
         'Source':'https://github.com/weednix/orgtiger',
     },
     packages=find_packages(exclude=['scratch', 'notes']),
