@@ -1,12 +1,20 @@
 import os
 import sys
 import inspect
+import pkg_resources
 
-from orgcrawler.logger import Logger
 
+import yaml
+from jinja2 import Template
 from git import Repo
 from git.exc import InvalidGitRepositoryError, NoSuchPathError
+from cerberus import Validator, schema_registry
 
+from orgcrawler import orgs
+from orgcrawler.logger import Logger
+from orgtiger.schemas import (
+    COMMON_SCHEMA,
+)
 
 DEFAULT_SPEC_DIR = "~/.local/orgtiger/spec.d"
 
@@ -45,7 +53,7 @@ class Spec(object):
         return True
         
 
-    def generate(self):
+    def generate_repo(self):
         logmsg = {
             'FILE': __file__.split('/')[-1],
             'CLASS': self.__class__.__name__,
@@ -79,6 +87,30 @@ class Spec(object):
         self.repo.index.commit('initial commit')
 
 
+    def generate_spec_from_org(self, org=None):
+        logmsg = {
+            'FILE': __file__.split('/')[-1],
+            'CLASS': self.__class__.__name__,
+            'METHOD': inspect.stack()[0][3],
+        }
+        if org is not None and isinstance(org, orgs.Org):
+            self._init_common(org)
 
+
+    def _init_common(self, org):
+        logmsg = {
+            'FILE': __file__.split('/')[-1],
+            'CLASS': self.__class__.__name__,
+            'METHOD': inspect.stack()[0][3],
+        }
+        local_template_file = 'templates/common.yaml.j2'
+        template_file = os.path.abspath(pkg_resources.resource_filename(__name__, local_template_file))
+        logmsg['MESSAGE'] = "processing template file '{}'".format(template_file)
+        print(logmsg['MESSAGE'])
+        with open(template_file) as t:
+            spec_file = Template(t.read()).render(master_account_id = org.master_account_id)
+        print(spec_file)
+        with open(os.path.join(self.spec_dir, 'common.yaml'), 'w') as f:
+            f.write(spec_file)
 
 

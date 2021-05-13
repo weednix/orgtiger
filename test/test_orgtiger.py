@@ -11,7 +11,7 @@ from orgcrawler.mock.org import (
     ORG_ACCESS_ROLE,
     MASTER_ACCOUNT_ID,
 )
-from  orgtiger.tiger import OrgTiger
+from orgtiger.tiger import OrgTiger
 
 
 def test_makes_orgtiger_instance():
