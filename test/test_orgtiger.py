@@ -5,7 +5,7 @@ from moto import (
     mock_iam,
 )
 
-from orgcrawler import orgs
+from orgcrawler import orgs, utils
 from orgcrawler.mock.org import (
     MockOrganization,
     ORG_ACCESS_ROLE,
@@ -37,3 +37,14 @@ def test_orgtiger_loads_an_existing_org():
     assert len(my_orgtiger.org.accounts) > 0
     assert len(my_orgtiger.org.org_units) > 0
     assert len(my_orgtiger.org.policies) > 0
+
+@mock_sts
+@mock_organizations
+def test_orgtiger_dumps_an_existing_org():
+    MockOrganization().simple()
+    my_orgtiger = OrgTiger(name='moch_org', org_access_role=ORG_ACCESS_ROLE, master_account_id=MASTER_ACCOUNT_ID)
+    my_orgtiger.org.load()
+    org_spec = my_orgtiger.org.dump()
+    #org_spec = my_orgtiger.org.dump_accounts()
+    print(utils.yamlfmt(org_spec))
+    assert false
