@@ -43,6 +43,12 @@ setup(
         'cerberus',
         'orgcrawler',
         'pytest',
+        'GitPython',
+        'jinja2',
+        'pytest',
+        'pytest-cov',
+        'moto',
+        'flake8'
     ],
     package_data={
         'orgtiger': [],

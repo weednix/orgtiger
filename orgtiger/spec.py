@@ -95,6 +95,7 @@ class Spec(object):
         }
         if org is not None and isinstance(org, orgs.Org):
             self._init_common(org)
+            self._init_sc_policies(org)
 
 
     def _init_common(self, org):
@@ -113,4 +114,20 @@ class Spec(object):
         with open(os.path.join(self.spec_dir, 'common.yaml'), 'w') as f:
             f.write(spec_file)
 
+
+    def _init_sc_policies(self, org):
+        logmsg = {
+            'FILE': __file__.split('/')[-1],
+            'CLASS': self.__class__.__name__,
+            'METHOD': inspect.stack()[0][3],
+        }
+        local_template_file = 'templates/service_control_polices.yaml.j2'
+        template_file = os.path.abspath(pkg_resources.resource_filename(__name__, local_template_file))
+        logmsg['MESSAGE'] = "processing template file '{}'".format(template_file)
+        print(logmsg['MESSAGE'])
+        with open(template_file) as t:
+            spec_file = Template(t.read()).render(sc_polices = org.policies)
+        print(spec_file)
+        with open(os.path.join(self.spec_dir, 'service_control_polices.common.yaml'), 'w') as f:
+            f.write(spec_file)
 
