@@ -36,7 +36,7 @@ def cleanup():
 
 
 def test_makes_orgtiger_instance():
-    my_orgtiger = OrgTiger()
+    my_orgtiger = OrgTiger(ORG_ACCESS_ROLE)
     assert isinstance(my_orgtiger, OrgTiger)
     assert my_orgtiger.spec_dir == os.path.expanduser(DEFAULT_SPEC_DIR)
     
@@ -157,7 +157,7 @@ def test_generate_spec_from_org(caplog):
     )
     my_orgtiger.org.load()
     my_orgtiger.generate_spec_from_org()
-    assert False
+    assert os.path.isfile(os.path.join(my_orgtiger.spec_dir, 'org_spec.yaml'))
     #cleanup()
 
 

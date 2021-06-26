@@ -21,11 +21,11 @@ DEFAULT_SPEC_DIR = "~/.local/orgtiger/spec.d"
 
 class OrgTiger(object):
 
-    def __init__(self, name=None, master_account_id=None, org_access_role=None,
-		spec_dir=DEFAULT_SPEC_DIR):
+    def __init__(self, org_access_role, name=None, master_account_id=None, spec_dir=DEFAULT_SPEC_DIR):
         self.name = name
-        if master_account_id is not None:
-            self.org = orgs.Org(master_account_id, org_access_role)
+        if master_account_id is None:
+            master_account_id = utils.get_master_account_id(org_access_role)
+        self.org = orgs.Org(master_account_id, org_access_role)
         self.spec_dir = spec_dir = os.path.expanduser(spec_dir)
         self.log = Logger()
 
@@ -92,9 +92,9 @@ class OrgTiger(object):
             'METHOD': inspect.stack()[0][3],
         }
         self.org.load()
+        self.validate_spec_repo()
         self.generate_spec_repo()
         org_spec = self.org.dump()
-        print(utils.yamlfmt(org_spec))
         spec_file = os.path.join(self.spec_dir, 'org_spec.yaml')
         with open(spec_file, mode='a') as f:
             f.write('---')

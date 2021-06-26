@@ -55,6 +55,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'orgtiger=orgtiger.cli:main',
         ],
     },
 
