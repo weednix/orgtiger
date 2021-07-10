@@ -35,12 +35,19 @@ def cleanup():
     shutil.rmtree(TEST_SPEC_BASEDIR)
 
 
-def test_makes_orgtiger_instance():
-    my_orgtiger = OrgTiger(ORG_ACCESS_ROLE)
+def test_makes_orgtiger_instance(caplog):
+    my_orgtiger = OrgTiger()
     assert isinstance(my_orgtiger, OrgTiger)
     assert my_orgtiger.spec_dir == os.path.expanduser(DEFAULT_SPEC_DIR)
-    
 
+    my_other_orgtiger = OrgTiger(org_access_role=ORG_ACCESS_ROLE)
+    assert isinstance(my_other_orgtiger, OrgTiger)
+    print(caplog.record_tuples)
+    for record in caplog.records:
+        assert record.levelname == "ERROR"
+    caplog.clear()
+
+    
 @mock_sts
 @mock_organizations
 def test_orgtiger_has_org_attribute():
@@ -159,7 +166,6 @@ def test_generate_spec_from_org(caplog):
     my_orgtiger.generate_spec_from_org()
     assert os.path.isfile(os.path.join(my_orgtiger.spec_dir, 'org_spec.yaml'))
     #cleanup()
-
 
 
 
