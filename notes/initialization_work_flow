@@ -1,0 +1,44 @@
+________________________________________________________________________________
+7/16/2021
+
+So what are the rules?  when a user starts up orgtiger tool thier environment could be in any number of states:
+
+- no aws account configured
+- account good, but is not a member of an Organization
+- account is Org master and no other account present
+- user is logged in as root user
+- user logged in as IAM user with permissions to use Organizations
+- user logged in as IAM user with no permissions to use Organizations
+- user can not assume role with permissions to use Organizations
+- user can assume role with permissions to use Organizations
+
+We don't need to program each and every case, but we do need to understand the condition matrix and design program flow.
+(And there may need to be differnt flows for differnt tools. don't know yet)
+
+
+Let's just start with running orgtiger for the first time - initializing spec files.
+
+
+Orgcrawler requires the user assume a role, even root. I do not want to refactor Orgcrawler.
+Orgcrawler requires both the master id and role as args
+So when Tiger() gets called, it will throw exception if either role or master id are not present.
+When it attempts to load Tiger.Org, it will simply pass exceptions up to calling cli to handle
+
+call orgtiger cli:
+    try:
+        aws sts-get-caller-id
+    except as e:
+        exit(e)
+    if not role_name:
+        role_name = default_role_name
+    if not master_id:
+        try:
+            master_id = Org.get_master_account_id(role_name)
+        except as e:
+            exit(e)
+
+    try:
+        my_tiger = Tiger(role_name, master_id)
+    except as e:
+        exit(e)
+
