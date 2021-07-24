@@ -11,6 +11,7 @@ from orgcrawler import orgs, utils
 from orgcrawler.logger import Logger
 
 from orgtiger.exceptions import (
+   ORG_CREATION_ERROR,
    SPEC_VALIDATION_ERROR,
    SPEC_GENERATION_ERROR,
 ) 
@@ -21,7 +22,7 @@ DEFAULT_SPEC_DIR = "~/.local/orgtiger/spec.d"
 
 class OrgTiger(object):
 
-    def __init__(self, org_access_role=None, name=None, master_account_id=None, spec_dir=DEFAULT_SPEC_DIR):
+    def __init__(self, org_access_role, master_account_id, name=None, spec_dir=DEFAULT_SPEC_DIR):
         logmsg = {
             'FILE': __file__.split('/')[-1],
             'CLASS': self.__class__.__name__,
@@ -30,15 +31,13 @@ class OrgTiger(object):
         self.log = Logger()
         self.name = name
         self.spec_dir = spec_dir = os.path.expanduser(spec_dir)
-        if org_access_role is not None:
-            if master_account_id is None:
-                try:
-                    master_account_id = utils.get_master_account_id(org_access_role)
-                except Exception as e:
-                    logmsg['MESSAGE'] = "Cannot determine master_account_id: '{}'".format(e)
-                    self.log.error(logmsg)
-                    return
+        try:
             self.org = orgs.Org(master_account_id, org_access_role)
+            self.org.load()
+        except Exception as e:
+            logmsg['MESSAGE'] = "Could not create org object."
+            self.log.critical(logmsg)
+            raise ORG_CREATION_ERROR(e)
 
     def validate_spec_repo(self):
         logmsg = {
@@ -102,7 +101,6 @@ class OrgTiger(object):
             'CLASS': self.__class__.__name__,
             'METHOD': inspect.stack()[0][3],
         }
-        self.org.load()
         self.validate_spec_repo()
         self.generate_spec_repo()
         org_spec = self.org.dump()
