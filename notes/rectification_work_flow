@@ -1,0 +1,80 @@
+________________________________________________________________________________
+7/30/2021
+
+
+Rectify based on diff
+---------------------
+
+So orgcrawler can dump an org, and awsorgs can read in a spec file after
+parsing with cerubus.  But these views are very different.  What we want is for
+the tool that generates spec does so in a structure orgtiger can use when doing
+rectification of org resources.
+
+My ideal is we can run a simple text diff between the generated spec and the
+parsed spec.  The diff is then used to generate a list of AWS commands, a
+change set, which will get run by the rectifier.  
+
+
+Genspec and Gitspec
+-------------------
+
+A nice feature of awsorg is the spec file has no knowledge of aws resource IDs or
+ARNs.  The user editting the spec only has to deal with resource names.  If we
+want to diff genspec from gitspec, then gitspec must contain IDs and ARNs and
+other user unfreindly crap.
+
+Also, building a change set based on diff would require a filtering tool to
+sanitize user editted gitspec, so that all keys are in predicted order.
+
+Or perhaps there are two versions of gitspec: one with IDs and such for running
+diffs, and another for the user to edit.  Now we have to be able to rectify
+the two gitspecs.  **This is a bad idea**
+
+Or perhaps the genspec also gets sanitized by the same filter used on the
+gitspec.  In this case there are two genspecs.  The filter removes IDs and such
+before writing and imposes the same key ordering rules as applied to gitspec.
+
+
+Change Set
+----------
+
+And what about change set?  what data structure should this have?  we would
+build this from a text diff of user freindly genspec and gitspec from which
+resource IDs are stripped.  Ultimately, we want a list of actual orgtiger
+function calls.  Should orgtiger functions do the resource ID lookups
+when called, or should the change set builder do these lookups?
+
+A human readable form of the change set should be presented to the user
+either as part of dryrun or as pending rectification event requiring some
+kind of approval.  Should presented change set contain resource IDs?
+
+Execution of change sets should be logged.  It may be useful if log events
+at all loglevels get recorded.  A user reviewing such logs can request 
+events from any loglevel.  Where should logs get stored?  perhaps a S3
+bucket in master account?
+
+
+Repo 
+----
+
+And what about repo state?  The user should be able to dryrun changes without
+having to commit.  But orgtiger should not run rectification if the git 
+working tree is dirty.
+
+In fact orgtiger should require to load gitspec from a designated remote repo
+whenever it runs rectification.  This would prevent conflicts if a user
+neglects to commit and push gitspec changes.
+
+It would make sence for this remote repo to live in CodeCommit in the Org master
+account.
+
+Any time orgtiger runs rectify, it should post the resulting org state (new
+genspec) to git along with run log, the change set driving rectification,
+timestamp, log of AWS responses.  All this gets committed, tagged, and pushed
+to remote repo.  Tags can then be used to revert org resources to a previous 
+state.
+
+The tagged genspec file from previous rectification run can be compared to
+current state.  If these do not match, then we know something altered the org
+outside of orgtiger.
+
